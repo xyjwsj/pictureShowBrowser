@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PictureMatrixView.h"
 
 @interface PictureBrowserViewController : UIViewController<UIScrollViewDelegate>
 
@@ -20,7 +21,7 @@
 
 - (instancetype)initWithDataSource:(NSArray*)dataSource;
 
-- (void)showInController:(UIViewController*)showViewController index:(NSInteger)index;
+- (void)showInController:(UIViewController*)showViewController index:(NSInteger)index picMatrixView:(PictureMatrixView*)picMatrixView;
 
 - (void)dismiss;
 

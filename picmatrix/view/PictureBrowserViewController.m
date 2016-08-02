@@ -14,6 +14,8 @@
 
 @implementation PictureBrowserViewController {
     CGFloat startOffsetX;
+    UIViewController* _superViewController;
+    PictureMatrixView * _picMatrixView;
 }
 
 -(instancetype)initWithDataSource:(NSArray *)dataSource {
@@ -29,7 +31,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor grayColor];
-    [self setupView];
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -37,15 +39,61 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)showInController:(UIViewController*)showViewController index:(NSInteger)index{
+- (void)showInController:(UIViewController*)showViewController index:(NSInteger)index picMatrixView:(PictureMatrixView *)picMatrixView{
+    _currentShowIndex = index;
+    _superViewController = showViewController;
+    _picMatrixView = picMatrixView;
+    UIImageView* clickView = nil;
+    
+    for (UIImageView* imageView in picMatrixView.subviews) {
+        if (imageView.tag == index) {
+            clickView = imageView;
+            break;
+        }
+    }
+    
+    CGRect clickRect = [picMatrixView convertRect:clickView.frame toView:showViewController.view];
+    
     [showViewController addChildViewController:self];
     [showViewController.view addSubview:self.view];
-    _currentShowIndex = index;
+    
+    CGRect endFrame = self.view.frame;
+    CGRect startFrame = clickRect;
+    self.view.frame = startFrame;
+    [UIView animateWithDuration:0.4 animations:^{
+        self.view.frame = endFrame;
+    } completion:^(BOOL finished) {
+        [self setupView];
+    }];
 }
 
 - (void)dismiss {
     [self removeFromParentViewController];
-    [self.view removeFromSuperview];
+    UIImageView* currentView = nil;
+    for (UIImageView* imageView in _picMatrixView.subviews) {
+        if (imageView.tag == _currentShowIndex) {
+            currentView = imageView;
+            break;
+        }
+    }
+    
+    CGRect clickRect = [_picMatrixView convertRect:currentView.frame toView:_superViewController.view];
+    
+    CGRect startFrame = self.view.frame;
+    CGRect endFrame = clickRect;
+    self.view.frame = startFrame;
+    
+    [UIView animateWithDuration:0.4 delay:0 options:UIViewAnimationOptionLayoutSubviews animations:^{
+        [self.view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        self.view.frame = endFrame;
+    } completion:^(BOOL finished) {
+        [self.view removeFromSuperview];
+    }];
+    
+//    [UIView animateWithDuration:0.4 animations:^{
+//    } completion:^(BOOL finished) {
+//    }];
+    
 }
 /*
 #pragma mark - Navigation
@@ -56,8 +104,8 @@
     // Pass the selected object to the new view controller.
 }
 */
-#pragma initView
 
+#pragma initView
 -(void)setupView {
     _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
     _scrollView.delegate = self;
@@ -112,6 +160,7 @@
     if (!leftAnimation && _pageControl.currentPage < pages) {
         _pageControl.currentPage = _pageControl.currentPage + 1;
     }
+    _currentShowIndex = _pageControl.currentPage;
 }
 
 @end

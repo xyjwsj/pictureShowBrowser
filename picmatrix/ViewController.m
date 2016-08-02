@@ -14,7 +14,9 @@
 
 @end
 
-@implementation ViewController
+@implementation ViewController {
+    PictureMatrixView* matrixView;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -36,7 +38,7 @@
     
     __block ViewController* weakSelf = self;
     
-    PictureMatrixView* matrixView = [[PictureMatrixView alloc] initWithFrame:CGRectMake(20, 100, [UIScreen mainScreen].bounds.size.width-100, 200) picSource:array picMatrix:picMatrix tapCallback:^(NSInteger index, NSArray *picArray) {
+    matrixView = [[PictureMatrixView alloc] initWithFrame:CGRectMake(20, 100, [UIScreen mainScreen].bounds.size.width-100, 200) picSource:array picMatrix:picMatrix tapCallback:^(NSInteger index, NSArray *picArray) {
         NSLog(@"index=%@", @(index));
         [weakSelf openPicBrowser:picArray index:index];
     }];
@@ -47,7 +49,7 @@
 }
 
 - (void)openPicBrowser:(NSArray*)picArray index:(NSInteger)index{
-    [[[PictureBrowserViewController alloc] initWithDataSource:picArray] showInController:self index:index];
+    [[[PictureBrowserViewController alloc] initWithDataSource:picArray] showInController:self index:index picMatrixView:matrixView];
 }
 
 - (void)didReceiveMemoryWarning {
